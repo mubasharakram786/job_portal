@@ -1,0 +1,49 @@
+{
+  "name": "job-portal",
+  "version": "1.0.0",
+  "type":"module",
+  "description": "A full-stack job portal platform connecting job seekers with employers through job listings, applications, and recruitment management.",
+  "keywords": [
+    "job-portal",
+    "job-board",
+    "recruitment",
+    "hiring",
+    "employment",
+    "careers",
+    "job-search",
+    "job-listings",
+    "applicant-tracking",
+    "ATS",
+    "mern",
+    "mongodb",
+    "express",
+    "react",
+    "nodejs",
+    "full-stack"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "job_portal"
+  },
+  "license": "ISC",
+  "author": "Mubashar Akram",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev" : "nodemon server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
