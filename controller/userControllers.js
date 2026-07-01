@@ -6,6 +6,7 @@ import crypto from 'crypto'
 
 
 
+
 function generateToken(id){
    return jwt.sign({id:id}, 'Job_portal' , {expiresIn:'1h'})
 }
@@ -43,6 +44,11 @@ export const loginUser = async(req,res,next) =>{
                 }
 
                 let token = generateToken(user._id);
+                res.cookie('token', token ,{
+                    httpOnly: true,
+                    secure: false,
+                    maxAge: 24 * 60 * 60 * 1000,
+                })
                 return res.status(200).json({message:'User has logged in successfully', token:token})
 
             }else{
@@ -54,9 +60,6 @@ export const loginUser = async(req,res,next) =>{
         }
 
 }
-
-
-
 
 export const forgotPassword = async(req,res,next)=>{
     const {email} = req.body
@@ -89,11 +92,35 @@ export const forgotPassword = async(req,res,next)=>{
             from:'mubashar1418@gmail.com',
             to:user.email,
             subject:'Reset Password Link',
-            html:`http://localhost:3000/${token}`
+            html:`Here is your reset  Link <a href=http://localhost:3000/${token}>http://localhost:3000/${token}</a> click here to reset your password`
          })
 
-         return res.status(200).json({message:"Password eset Link has been sent at your email successfully!"})
+         return res.status(200).json({message:"Password Reset Link has been sent at your email address successfully!"})
 
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
+}
+
+export const resetPassword = async(req,res,next)=>{
+    const {password,token} = req.body 
+    try {
+        const user = await User.findOne({resetToken:token , resetTokenExpiration:{$gt:Date.now()}})
+        if(!user){
+            return res.status(401).json({message:"Token Expired or doesn't Matched"})
+        }
+              const isSamePassword = await bcrypt.compare(password,user.password);
+        if(isSamePassword){
+            return res.status(400).json({message:"New password must be different from current password"})
+        }
+        const genSalt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(password, genSalt)
+        user.password = hashPassword
+        user.resetToken = undefined
+        user.resetTokenExpiration = undefined
+        await user.save()
+        return res.status(200).json({message:"Password has been updated successfully!"})
+        
     } catch (error) {
         return res.status(500).json({message:error.message})
     }
