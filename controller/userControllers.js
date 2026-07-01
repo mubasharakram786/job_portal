@@ -1,6 +1,9 @@
 import User from '../model/user.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import nodemailer from 'nodemailer'
+import crypto from 'crypto'
+
 
 
 function generateToken(id){
@@ -50,4 +53,48 @@ export const loginUser = async(req,res,next) =>{
             return res.status(500).json({message:error.message})
         }
 
+}
+
+
+
+
+export const forgotPassword = async(req,res,next)=>{
+    const {email} = req.body
+    const token = crypto.randomBytes(32).toString('hex');
+    try {
+         const user = await User.findOne({email});
+         if(!user){
+            return res.status(401).json({message:"Couldn't find any account related to this eamil id"})
+         }
+         user.resetToken = token;
+         user.resetTokenExpiration = Date.now() + 900000;
+         await user.save()
+         const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+                port: 587,
+                secure: false,
+                auth:{
+                    user:process.env.EMAIL_USER,
+                    pass:process.env.EMAIL_PASS
+                }
+})
+         transporter.verify((error, success) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log("SMTP Ready");
+                }
+            });
+         await transporter.sendMail({
+            from:'mubashar1418@gmail.com',
+            to:user.email,
+            subject:'Reset Password Link',
+            html:`http://localhost:3000/${token}`
+         })
+
+         return res.status(200).json({message:"Password eset Link has been sent at your email successfully!"})
+
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
 }

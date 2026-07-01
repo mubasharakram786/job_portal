@@ -16,7 +16,9 @@ const userSchema = mongoose.Schema({
         type:String,
         required:true,
         minLength:8
-    }
+    },
+    resetToken:String,
+    resetTokenExpiration:Date,
 },{timestamps:true})
 
 const userModal = mongoose.model('User', userSchema)
