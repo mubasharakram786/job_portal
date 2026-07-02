@@ -11,6 +11,7 @@ app.use(cors())
 
 app.use('/api', userRoutes)
 
+
 connection()
 app.listen(9000,()=>{
     console.log("Server is Running on Port 9000")
