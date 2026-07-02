@@ -18,19 +18,74 @@ export const signUpUser = async(req,res,next)=>{
         return res.status(400).json({error:errors.array()})
     }
    try {
-      
+        const token = crypto.randomBytes(32).toString('hex')
         const genSalt = await bcrypt.genSalt(10)
         const hashPassword = await bcrypt.hash(password,genSalt)
-        const user = new User({name:name,email:email,password:hashPassword});
+        const user = new User({name:name,email:email,password:hashPassword, verificationToken:token , verificationTokenExpires:Date.now() + 900000});
         await user.save()
+         const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+                port: 587,
+                secure: false,
+                auth:{
+                    user:process.env.EMAIL_USER,
+                    pass:process.env.EMAIL_PASS
+                }
+})
+               transporter.verify((error, success) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log("SMTP Ready");
+                }
+            });
+         await transporter.sendMail({
+            from:process.env.EMAIL_USER,
+            to:user.email,
+            subject:'Verify Account',
+            html:`<p>Thank you for signing up!</p>
+                <p>Please click the button below to verify your email address:</p>
+
+                <a href=http://localhost/verify-email/${token}
+                style="
+                    background:#2563eb;
+                    color:white;
+                    padding:12px 20px;
+                    text-decoration:none;
+                    border-radius:5px;
+                    display:inline-block;
+                ">
+                Verify Email
+                </a>
+
+                <p>This link will expire in <strong>15 minutes</strong>.</p>
+
+                <p>If you did not create this account, you can safely ignore this email.</p>
+
+                <p>Best regards,<br>Your Company Name</p>`
+         })
         return res.status(201).json({message:"User has been registered successfully!", user:user})
    } catch (error) {
        return res.status(500).json({message:error.message})
    }
-
-
 }
 
+export const verifyUser = async(req,res,next)=>{
+    const {token} = req.body;
+    try {
+        const user = await User.findOne({verificationToken:token ,verificationTokenExpires:{$gt: Date.now()} });
+        if(!user){
+            return res.status(400).json({message:"Token is expired or invalid"})
+        }
+        user.isVerified = true
+        user.verificationToken = undefined
+        user.verificationTokenExpires = undefined
+        await user.save()
+        return res.status(200).json({message:"Email verified successfully!"})
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
+}
 
 export const loginUser = async(req,res,next) =>{
     const {email,password} = req.body
@@ -40,6 +95,9 @@ export const loginUser = async(req,res,next) =>{
     }
         try {
             const user = await User.findOne({email});
+            if(!user.isVerified){
+                return res.status(400).json({message:"Email is not verified"})
+            }
             if(user){
                 const matchPassword = await bcrypt.compare(password , user.password);
                 if(!matchPassword){
