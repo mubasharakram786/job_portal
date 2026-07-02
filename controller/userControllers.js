@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import nodemailer from 'nodemailer'
 import crypto from 'crypto'
-
+import { validationResult } from 'express-validator'
 
 
 
@@ -13,12 +13,12 @@ function generateToken(id){
 
 export const signUpUser = async(req,res,next)=>{
    const {name,email,password} = req.body;
-        
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        return res.status(400).json({error:errors.array()})
+    }
    try {
-        const isExist = await User.findOne({email});
-        if(isExist){
-           return res.status(409).json({message: 'User already exists.'})
-        }
+      
         const genSalt = await bcrypt.genSalt(10)
         const hashPassword = await bcrypt.hash(password,genSalt)
         const user = new User({name:name,email:email,password:hashPassword});
@@ -34,7 +34,10 @@ export const signUpUser = async(req,res,next)=>{
 
 export const loginUser = async(req,res,next) =>{
     const {email,password} = req.body
-
+       const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        return res.status(400).json({error:errors.array()})
+    }
         try {
             const user = await User.findOne({email});
             if(user){
@@ -104,6 +107,10 @@ export const forgotPassword = async(req,res,next)=>{
 
 export const resetPassword = async(req,res,next)=>{
     const {password,token} = req.body 
+           const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        return res.status(400).json({error:errors.array()})
+    }
     try {
         const user = await User.findOne({resetToken:token , resetTokenExpiration:{$gt:Date.now()}})
         if(!user){
