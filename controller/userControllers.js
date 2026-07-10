@@ -12,7 +12,7 @@ function generateToken(id){
 }
 
 export const signUpUser = async(req,res,next)=>{
-   const {name,email,password} = req.body;
+   const {name,email,password,role} = req.body;
     const errors = validationResult(req)
     if(!errors.isEmpty()){
         return res.status(400).json({error:errors.array()})
@@ -21,7 +21,7 @@ export const signUpUser = async(req,res,next)=>{
         const token = crypto.randomBytes(32).toString('hex')
         const genSalt = await bcrypt.genSalt(10)
         const hashPassword = await bcrypt.hash(password,genSalt)
-        const user = new User({name:name,email:email,password:hashPassword, verificationToken:token , verificationTokenExpires:Date.now() + 900000});
+        const user = new User({name:name,email:email,password:hashPassword,role:role, verificationToken:token , verificationTokenExpires:Date.now() + 900000});
         await user.save()
          const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
@@ -64,7 +64,7 @@ export const signUpUser = async(req,res,next)=>{
 
                 <p>Best regards,<br>Your Company Name</p>`
          })
-        return res.status(201).json({message:"User has been registered successfully!", user:user})
+        return res.status(201).json({message:"User has been registered successfully!", user:user._id})
    } catch (error) {
        return res.status(500).json({message:error.message})
    }
@@ -95,6 +95,9 @@ export const loginUser = async(req,res,next) =>{
     }
         try {
             const user = await User.findOne({email});
+            if(!user){
+                return res.status(404).json({message:"User not found."})
+            }
             if(!user.isVerified){
                 return res.status(400).json({message:"Email is not verified"})
             }
