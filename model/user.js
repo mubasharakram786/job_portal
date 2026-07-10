@@ -2,11 +2,6 @@ import mongoose from 'mongoose'
 
 
 const userSchema = mongoose.Schema({
-    name:{
-        type:String,
-        required:true,
-        minLength:5
-    },
     email:{
         type:String,
         required:true,
@@ -22,6 +17,11 @@ const userSchema = mongoose.Schema({
         isVerified: {
         type: Boolean,
         default: false
+    },
+    role:{
+        type:String,
+        enum:['candidate', 'recruiter'],
+
     },
      verificationToken: String,
   verificationTokenExpires: Date
