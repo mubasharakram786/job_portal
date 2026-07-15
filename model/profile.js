@@ -80,9 +80,20 @@ const profileSchema = new mongoose.Schema(
       trim: true,
     },
 
-    resume: {
-      type: String,
-      required: true,
+   resume: {
+      url: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      publicId: {
+        type: String,
+        required: true,
+      },
+      originalName: {
+        type: String,
+        required: true,
+      },
     },
 
     expectedSalary: {

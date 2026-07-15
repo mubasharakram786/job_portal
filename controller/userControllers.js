@@ -46,7 +46,7 @@ export const signUpUser = async(req,res,next)=>{
             html:`<p>Thank you for signing up!</p>
                 <p>Please click the button below to verify your email address:</p>
 
-                <a href=http://localhost/verify-email/${token}
+                <a href=http://localhost:5000/verify-email/${token}
                 style="
                     background:#2563eb;
                     color:white;
@@ -64,7 +64,7 @@ export const signUpUser = async(req,res,next)=>{
 
                 <p>Best regards,<br>Your Company Name</p>`
          })
-        return res.status(201).json({message:"User has been registered successfully!", user:user._id})
+        return res.status(201).json({message:"Check your mailbox for verify for the account ", user:user._id})
    } catch (error) {
        return res.status(500).json({message:error.message})
    }
@@ -72,6 +72,7 @@ export const signUpUser = async(req,res,next)=>{
 
 export const verifyUser = async(req,res,next)=>{
     const {token} = req.body;
+    console.log(token,"===============================")
     try {
         const user = await User.findOne({verificationToken:token ,verificationTokenExpires:{$gt: Date.now()} });
         if(!user){

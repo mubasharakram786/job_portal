@@ -1,12 +1,13 @@
 import express from 'express'
 import { createProfile } from '../controller/profileControllers.js'
-import { auth } from '../middleware/authMiddle.js'
+import { auth } from '../middleware/authMiddleware.js'
+import upload from '../middleware/upload.js'
 
 const router = express.Router()
 
 
 
-router.post('/create-profile' , auth,  createProfile)
+router.post('/create-profile' , auth , upload.single('resume'),  createProfile)
 
 
 export default router
