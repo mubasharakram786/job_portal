@@ -5,9 +5,9 @@ export const addJobValidation = [
 
   body("description").trim().notEmpty().withMessage("Description is required."),
 
-  body("companyId")
-    .notEmpty().withMessage("Company id is required.")
-    .isMongoId().withMessage("Company id must be a valid id."),
+  // body("companyId")
+  //   .notEmpty().withMessage("Company id is required.")
+  //   .isMongoId().withMessage("Company id must be a valid id."),
 
   body("location").trim().notEmpty().withMessage("Location is required."),
 
@@ -64,5 +64,5 @@ export const addJobValidation = [
 
   body("isUrgent").optional().isBoolean().withMessage("isUrgent must be a boolean."),
 
-  body("slug").trim().notEmpty().withMessage("Slug is required."),
+  // body("slug").trim().notEmpty().withMessage("Slug is required."),
 ];

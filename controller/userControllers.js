@@ -9,8 +9,8 @@ import { sendEmail } from '../services/email.service.js'
 
 
 
-function generateToken(id){
-   return jwt.sign({id:id}, 'Job_portal' , {expiresIn:'1h'})
+function generateToken(id,role){
+   return jwt.sign({id:id,role:role}, 'Job_portal' , {expiresIn:'1h'})
 }
 
 export const signUpUser = async(req,res,next)=>{
@@ -73,12 +73,7 @@ export const loginUser = async(req,res,next) =>{
                    return res.status(401).json({message:"Password doesn't matched"})
                 }
 
-                let token = generateToken(user._id);
-                res.cookie('token', token ,{
-                    httpOnly: true,
-                    secure: false,
-                    maxAge: 24 * 60 * 60 * 1000,
-                })
+                let token = generateToken(user._id, user.role);
                 return res.status(200).json({message:'User has logged in successfully', token:token, user:{id:user._id,email:user.email,role:user.role}})
 
             }else{
@@ -166,20 +161,6 @@ export const resendVerification = async(req,res,next)=>{
          })
         return res.status(201).json({message:"Check your mailbox for verify for the account ", user:user._id})
 
-    } catch (error) {
-        return res.status(500).json({message:error.message})
-    }
-}
-
-
-export const logout = async(req,res,next) =>{
-    try {
-        res.clearCookie('token' , {
-             httpOnly: true,
-                    secure: false,
-                    maxAge: 24 * 60 * 60 * 1000,
-        })
-        return res.status(200).json({message:"User have been logout successfully"})
     } catch (error) {
         return res.status(500).json({message:error.message})
     }

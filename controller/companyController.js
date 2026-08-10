@@ -11,18 +11,42 @@ export const addJob = async(req,res,next)=>{
 
 const postedBy = req.userId
 
+const company = await Company.findOne({userId:postedBy})
+
+if(!company){
+    return res.status(404).json({message:"Company not found."})
+}
+const createSlug = (text) => {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+};
+// const slug = createSlug(req.body.title)
 try {
     const job = new Job({
         postedBy,
+        companyId:company._id,
       ...req.body
 })
-    
+job.slug = `${createSlug(job.title)}-${job._id.toString().slice(-6)}`;   
 await job.save()
 return res.status(201).json({message:"New Job Created Successfully"})
 } catch (error) {
     return res.status(400).json({message:error})
 }
 
+}
+export const getAllJobs = async(req,res,next)=>{
+    const userId = req.userId
+    try {
+        const jobs = await Job.find({postedBy:userId});
+        return res.status(200).json({message:"Fetch All Jobs Successfully"})
+    } catch (error) {
+        return res.status(404).json({message:""})
+    }
 }
 export const recruiterProfile = async(req,res,next)=>{
 
