@@ -2,8 +2,9 @@ import jwt from 'jsonwebtoken'
 
 export const auth = (req,res,next)=>{
 
-    const token = req.cookies.token
-    
+    const authHeader = req.headers.authorization
+    const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null
+
     if(!token){
         return res.status(401).json({message:"No token found"})
     }
@@ -16,6 +17,7 @@ export const auth = (req,res,next)=>{
 
     req.userId = decode.id
     
+
     next()
 
 }
