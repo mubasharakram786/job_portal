@@ -1,6 +1,7 @@
 import Company from "../model/company.js";
 import Job from "../model/job.js"
 import { validationResult } from "express-validator";
+import JobApplication from "../model/jobApplication.js";
 
 export const addJob = async(req,res,next)=>{
     const errors = validationResult(req)
@@ -102,4 +103,15 @@ export const getCompanyProfile = async(req,res,next)=>{
     }
 
     return res.status(200).json({message:"Company profile fetch successfully!", company})
+}
+
+
+export const fetchApplicants = async(req,res,next)=>{
+    const applicants = await JobApplication.find().populate('profileId');
+
+    if(!applicants){
+        return res.status(404).json({message:"No applicants found!"})
+    }
+
+    return res.status(200).json({message:"Applicants fetch successfully", applicants})
 }
