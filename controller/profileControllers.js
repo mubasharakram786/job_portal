@@ -2,6 +2,7 @@ import Profile from '../model/profile.js'
 import { validationResult } from 'express-validator'
 import { uploadToCloudinary } from '../services/cloudinary.service.js'
 import JobApplication from '../model/jobApplication.js'
+import Job from '../model/job.js'
 export const createProfile = async(req,res,next)=>{
 const errors = validationResult(req)
     if(!errors.isEmpty()){
@@ -94,4 +95,29 @@ export const candidateProfile = async(req,res,next)=>{
     }
 
     return res.status(200).json({message:"Fetch candidate profile successfully", candidate})
+}
+
+export const jobStatus =  async(req,res,next)=>{
+    const userId = req.userId
+    const {jobId} = req.query
+    // const job = await Job.findById({postedBy:userId});
+
+    // if(!job){
+    //     return res.status(404).json({message:"Job not found"})
+    // }
+
+    const jobApplicationStatus = await JobApplication.findOne({userId, jobId})
+
+            if (!jobApplicationStatus) {
+        return res.status(200).json({
+            message: "You have not applied for this job yet",
+            hasApplied: false
+        });
+        }
+
+        return res.status(200).json({
+        message: "You have already applied for this job",
+        hasApplied: true
+        });
+
 }

@@ -1,5 +1,5 @@
 import express from 'express'
-import { createProfile, uploadResume,uploadProfilePic,applyJobApplication,getCandidateProfile,updateProfile,candidateProfile } from '../controller/profileControllers.js'
+import { createProfile, uploadResume,uploadProfilePic,applyJobApplication,getCandidateProfile,updateProfile,candidateProfile,jobStatus } from '../controller/profileControllers.js'
 import { auth } from '../middleware/authMiddleware.js'
 import {imageUpload, resumeUpload} from '../middleware/upload.js'
 import { createProfileValidation } from '../validations/profileValidation.js'
@@ -22,4 +22,7 @@ router.post('/apply-job', auth , applyJobApplication)
 
 // public profile
 router.get('/candidate/:id' , candidateProfile)
+
+// check job Status
+router.get('/job-status', auth , jobStatus)
 export default router
