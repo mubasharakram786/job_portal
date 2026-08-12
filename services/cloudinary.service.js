@@ -1,12 +1,12 @@
 import { Readable } from "stream";
 import cloudinary from "../config/cloudinary.js";
 
-export const uploadToCloudinary = async (file) => {
+export const uploadToCloudinary = async (file,folder) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         resource_type: "raw",
-        folder: "resumes",
+        folder
       },
       (error, result) => {
         if (error) {

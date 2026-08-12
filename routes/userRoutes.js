@@ -1,6 +1,6 @@
 import express from 'express'
 
-import { forgotPassword, loginUser, logout, resendVerification, resetPassword, signUpUser, verifyUser } from '../controller/userControllers.js'
+import { forgotPassword, loginUser,  resendVerification, resetPassword, signUpUser, verifyUser } from '../controller/userControllers.js'
 import {body} from 'express-validator'
 import { loginValidation, passwordValidation, registerValidation } from '../validations/authValidation.js'
 const router = express.Router()
@@ -24,6 +24,6 @@ router.post('/reset-password', passwordValidation , resetPassword)
 router.post('/resend-verification' , resendVerification)
 
 // Logout
-router.post('/logout', logout)
+// router.post('/logout', logout)
 
 export default router
