@@ -43,7 +43,15 @@ export const getAllJobs = async(req,res,next)=>{
     const userId = req.userId
     try {
         const jobs = await Job.find({postedBy:userId});
-        return res.status(200).json({message:"Fetch All Jobs Successfully"})
+        return res.status(200).json({message:"Fetch All Jobs Successfully", jobs})
+    } catch (error) {
+        return res.status(404).json({message:""})
+    }
+}
+export const fetchAllJobs = async(req,res,next)=>{
+    try {
+        const jobs = await Job.find();
+        return res.status(200).json({message:"Fetch All Jobs Successfully", jobs})
     } catch (error) {
         return res.status(404).json({message:""})
     }
@@ -70,4 +78,28 @@ const userId = req.userId;
     return res.status(400).json({message:error})
  }
 
+}
+export const fetchSingleJob = async(req,res,next)=>{
+    const {slug} = req.params
+    
+    try {
+        const job = await Job.findOne({slug})
+        if(!job){
+            return res.status(404).json({message:"Job not found"})
+        }
+        return res.status(200).json({message:"Job fetch successfully", job})
+    } catch (error) {
+        return res.status(500).json({message:"Something went wrong"})
+    }
+}
+
+export const getCompanyProfile = async(req,res,next)=>{
+    const userId = req.userId
+    const company = await Company.findOne({userId})
+
+    if(!company){
+        return res.status(404).json({message:"Company not found"})
+    }
+
+    return res.status(200).json({message:"Company profile fetch successfully!", company})
 }
