@@ -121,3 +121,16 @@ export const jobStatus =  async(req,res,next)=>{
         });
 
 }
+
+export const appliedJobs = async(req,res,next)=>{
+
+    const userId = req.userId;
+
+    const jobs = await JobApplication.find({userId}).populate('jobId');
+
+    if(!jobs){
+        return res.status(404).json({message:"No jobs found"})
+    }
+
+    return res.status(200).json({message:"Applied jobs list fetch successfully", jobs:jobs})
+}
