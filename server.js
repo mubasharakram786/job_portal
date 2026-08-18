@@ -38,6 +38,6 @@ io.on('disconnect', ()=>{
 })
 
 connection()
-app.listen(process.env.PORT || 9001,()=>{
+server.listen(process.env.PORT || 9001,()=>{
     console.log("Server is Running on Port 9000")
 })
