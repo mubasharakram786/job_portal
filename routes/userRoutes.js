@@ -2,11 +2,11 @@ import express from 'express'
 
 import { forgotPassword, loginUser,  resendVerification, resetPassword, signUpUser, verifyUser } from '../controller/userControllers.js'
 import {body} from 'express-validator'
-import { loginValidation, passwordValidation, registerValidation } from '../validations/authValidation.js'
+import { loginValidation, passwordValidation } from '../validations/authValidation.js'
 const router = express.Router()
 
 // Sign up User
-router.post('/register', registerValidation,  signUpUser)
+router.post('/register',   signUpUser)
 
 // Verify User
 router.post('/verify-account' , verifyUser )

@@ -1,15 +1,15 @@
 import {body} from 'express-validator'
 import User from '../model/user.js'
 
-export const registerValidation =[
-        body('email').notEmpty().withMessage('Email is Required.').isEmail().withMessage('Please enter a valid email address').custom(async(email)=>{
-                     const isExist = await User.findOne({email});
-                    if(isExist){
-                      throw new Error('Email already exists.')
-                    }
-        }),
-        body('password').isLength({min:8}).withMessage('Password must be at least 8 characters long.')
-    ]
+// export const registerValidation =[
+//         body('email').notEmpty().withMessage('Email is Required.').isEmail().withMessage('Please enter a valid email address').custom(async(email)=>{
+//                      const isExist = await User.findOne({email});
+//                     if(isExist){
+//                       throw new Error('Email already exists.')
+//                     }
+//         }),
+//         body('password').isLength({min:8}).withMessage('Password must be at least 8 characters long.')
+//     ]
 
 export const loginValidation = [
     body('email').notEmpty().withMessage('Email is Required.').isEmail().withMessage('Please enter a valid email address'),
