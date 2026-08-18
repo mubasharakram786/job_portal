@@ -1,5 +1,5 @@
 import express from 'express'
-import { addJob, fetchAllJobs, fetchSingleJob, getAllJobs, getCompanyProfile, recruiterProfile,fetchApplicants } from '../controller/companyController.js'
+import { addJob, fetchAllJobs, fetchSingleJob, getAllJobs, getCompanyProfile, recruiterProfile,fetchApplicants,fetchJobApplicants,updateJobStatus } from '../controller/companyController.js'
 import { recruiterProfileValidation } from '../validations/companyValidation.js'
 import { addJobValidation } from '../validations/jobValidation.js'
 import { auth } from '../middleware/authMiddleware.js'
@@ -26,5 +26,11 @@ router.get('/public-jobs/:slug' , fetchSingleJob)
 
 // view Applicants
 router.get('/applicants-list' , auth , fetchApplicants)
+
+// view Applicants of Specific Job
+router.get('/job-applicants', auth , fetchJobApplicants)
+
+// Update Job Status
+router.put('/job-status', auth , updateJobStatus)
 
 export default router

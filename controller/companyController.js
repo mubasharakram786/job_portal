@@ -115,3 +115,60 @@ export const fetchApplicants = async(req,res,next)=>{
 
     return res.status(200).json({message:"Applicants fetch successfully", applicants})
 }
+
+
+export const fetchJobApplicants = async(req,res,next)=>{
+
+    const {jobId} = req.query
+
+    const jobApplicants = await JobApplication.find({jobId}).populate('profileId')
+
+    if(!jobApplicants){
+         return res.status(404).json({message:"No applicants found related to this job"})
+    }
+
+    return res.status(200).json({message:"Applicants fetch successfully", jobApplicants})
+
+
+}
+
+const APPLICATION_STATUSES = [
+    "applied",
+    "reviewing",
+    "shortlisted",
+    "interview",
+    "rejected",
+    "hired",
+    "withdrawn"
+]
+
+export const updateJobStatus = async(req,res,next)=>{
+    const { applicationId, status } = req.body
+
+    if(!applicationId || !status){
+        return res.status(400).json({message:"applicationId and status are required"})
+    }
+
+    if(!APPLICATION_STATUSES.includes(status)){
+        return res.status(400).json({message:"Invalid status value"})
+    }
+
+    try {
+        const application = await JobApplication.findById(applicationId).populate('jobId')
+
+        if(!application){
+            return res.status(404).json({message:"Application not found"})
+        }
+
+        if(application.jobId?.postedBy?.toString() !== req.userId){
+            return res.status(403).json({message:"You are not authorized to update this application"})
+        }
+
+        application.status = status
+        await application.save()
+
+        return res.status(200).json({message:"Application status updated successfully", application})
+    } catch (error) {
+        return res.status(500).json({message:"Something went wrong"})
+    }
+}
