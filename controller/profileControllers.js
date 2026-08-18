@@ -125,12 +125,30 @@ export const jobStatus =  async(req,res,next)=>{
 export const appliedJobs = async(req,res,next)=>{
 
     const userId = req.userId;
+    const limit = 4;
 
-    const jobs = await JobApplication.find({userId}).populate('jobId');
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const skip = (page - 1) * limit;
 
-    if(!jobs){
+    const totalJobs = await JobApplication.countDocuments({userId});
+
+    const jobs = await JobApplication.find({userId})
+        .populate({path:'jobId', populate:{
+            path:'companyId',
+            select:'companyName companyLogo'
+        }})
+        .skip(skip)
+        .limit(limit);
+
+    if(!jobs.length){
         return res.status(404).json({message:"No jobs found"})
     }
 
-    return res.status(200).json({message:"Applied jobs list fetch successfully", jobs:jobs})
+    return res.status(200).json({
+        message:"Applied jobs list fetch successfully",
+        jobs,
+        totalJobs,
+        totalPages: Math.ceil(totalJobs / limit),
+        currentPage: page
+    })
 }
