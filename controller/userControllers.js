@@ -8,7 +8,7 @@ import { resetPasswordEmail } from "../utils/emailTemplates/resetPasswordEmail.j
 import { sendEmail } from "../services/email.service.js";
 
 function generateToken(id, role) {
-  return jwt.sign({ id: id, role: role }, "Job_portal", { expiresIn: "1h" });
+  return jwt.sign({ id: id, role: role }, process.env.JWT_SECRET, { expiresIn: "1h" });
 }
 
 export const signUpUser = async (req, res, next) => {
