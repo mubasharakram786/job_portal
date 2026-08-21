@@ -2,6 +2,8 @@ import Company from "../model/company.js";
 import Job from "../model/job.js"
 import { validationResult } from "express-validator";
 import JobApplication from "../model/jobApplication.js";
+import { getIO } from "../config/socket.js";
+import { populate } from "dotenv";
 
 export const addJob = async(req,res,next)=>{
     const errors = validationResult(req)
@@ -144,7 +146,6 @@ const APPLICATION_STATUSES = [
 
 export const updateJobStatus = async(req,res,next)=>{
     const { applicationId, status } = req.body
-
     if(!applicationId || !status){
         return res.status(400).json({message:"applicationId and status are required"})
     }
@@ -155,7 +156,6 @@ export const updateJobStatus = async(req,res,next)=>{
 
     try {
         const application = await JobApplication.findById(applicationId).populate('jobId')
-
         if(!application){
             return res.status(404).json({message:"Application not found"})
         }
@@ -164,8 +164,20 @@ export const updateJobStatus = async(req,res,next)=>{
             return res.status(403).json({message:"You are not authorized to update this application"})
         }
 
-        application.status = status
+        application.status = status       
         await application.save()
+        
+    
+        const io = getIO()
+
+        const applicantUserId = application.userId?._id ?? application.userId
+
+        io.to(`user:${applicantUserId}`).emit('applicationStatusUpdated', {
+            applicationId:application._id,
+            jobId:application.jobId._id,
+            status:application.status,
+            message: `Your application status has been updated to ${status}`,
+        })
 
         return res.status(200).json({message:"Application status updated successfully", application})
     } catch (error) {
